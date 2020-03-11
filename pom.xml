@@ -37,6 +37,36 @@
     </plugins>
   </build>
 
+    <profiles>
+        <profile>
+            <id>local-postgresql</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+
+            <properties>
+
+                <db.name>postgresql</db.name>
+                <db.url>jdbc:postgresql://localhost:5432/</db.url>
+                <db.user.name>postgres</db.user.name>
+                <db.user.password>docker</db.user.password>
+                <db.user.schema>bp</db.user.schema>
+                <db.driver.name>org.postgresql.Driver</db.driver.name>
+                <hibernate.dialect>org.hibernate.dialect.PostgreSQL9Dialect</hibernate.dialect>
+                <server.port>8080</server.port>
+
+            </properties>
+
+            <dependencies>
+                <dependency>
+                    <groupId>org.postgresql</groupId>
+                    <artifactId>postgresql</artifactId>
+                    <version>42.2.5</version>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+
   <dependencies>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -85,6 +115,16 @@
     <dependency>
       <groupId>io.micrometer</groupId>
       <artifactId>micrometer-registry-jmx</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.zaxxer</groupId>
+      <artifactId>HikariCP</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-jooq</artifactId>
     </dependency>
 
   </dependencies>
