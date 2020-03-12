@@ -42,19 +42,14 @@ public class PgDataUtils implements IDataUtils {
     }
 
     @Override
-    public void createTable(String schemaName, String tableName) {
+    public void createParameterTable(String schemaName, String tableName) {
         CreateTableColumnStep createTableStmt = dslContext.createTable(tableName)
                 .column("ID", SQLDataType.INTEGER.identity(true))
-                .column("OID", SQLDataType.VARCHAR(512))
                 .column("VERSION", SQLDataType.BIGINT.defaultValue(0L))
-                .column("CREATE_DATE", SQLDataType.DATE.nullable(false))
-                .column("CREATE_USER_ID", SQLDataType.BIGINT)
-                .column("UPDATE_DATE", SQLDataType.DATE.nullable(false))
-                .column("UPDATE_USER_ID", SQLDataType.BIGINT)
                 .column("OBSOLETE", SQLDataType.BOOLEAN)
-                .column("TEXT_REPRESENTATION", SQLDataType.VARCHAR(512))
-                .column("PARENT_ID", SQLDataType.BIGINT)
-                .column("IS_GROUP", SQLDataType.BOOLEAN);
+                .column("NAME", SQLDataType.VARCHAR(512))
+                .column("DESCRIPTION", SQLDataType.VARCHAR(1024))
+                .column("VALUE", SQLDataType.VARCHAR(1024));
 
         createTableStmt.execute();
     }
