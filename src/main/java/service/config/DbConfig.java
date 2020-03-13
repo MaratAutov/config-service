@@ -84,7 +84,7 @@ public class DbConfig {
      * Служебный класс, обновляющий поля аудита
      */
     @SuppressWarnings("unchecked")
-    private class AuditRecordListener extends DefaultRecordListener {
+    private static class AuditRecordListener extends DefaultRecordListener {
         @Override
         public void storeStart(RecordContext ctx) {
             final Record record = ctx.record();

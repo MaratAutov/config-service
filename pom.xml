@@ -1,136 +1,154 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
-    <groupId>ru.x5.prototypes</groupId>
-    <artifactId>config-service</artifactId>
-    <version>1.0-SNAPSHOT</version>
+  <groupId>ru.x5.prototypes</groupId>
+  <artifactId>config-service</artifactId>
+  <version>1.0-SNAPSHOT</version>
 
-    <packaging>war</packaging>
+  <packaging>war</packaging>
 
-    <properties>
-        <disruptor.version>3.4.2</disruptor.version>
-    </properties>
+  <properties>
+    <disruptor.version>3.4.2</disruptor.version>
+    <flatmapper.version>8.2.1</flatmapper.version>
+  </properties>
 
-    <parent>
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>2.2.5.RELEASE</version>
+  </parent>
+
+  <build>
+    <!-- resource plugin -->
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+
+    <plugins>
+      <plugin>
         <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.2.5.RELEASE</version>
-    </parent>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
 
-    <build>
-        <!-- resource plugin -->
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
+  <profiles>
+    <profile>
+      <id>local-postgresql</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
 
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
+      <properties>
 
-    <profiles>
-        <profile>
-            <id>local-postgresql</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
+        <db.name>postgresql</db.name>
+        <db.url>jdbc:postgresql://localhost:5432/</db.url>
+        <db.user.name>postgres</db.user.name>
+        <db.user.password>docker</db.user.password>
+        <db.user.schema>bp</db.user.schema>
+        <db.driver.name>org.postgresql.Driver</db.driver.name>
+        <hibernate.dialect>org.hibernate.dialect.PostgreSQL9Dialect</hibernate.dialect>
 
-            <properties>
+      </properties>
 
-                <db.name>postgresql</db.name>
-                <db.url>jdbc:postgresql://localhost:5432/</db.url>
-                <db.user.name>postgres</db.user.name>
-                <db.user.password>docker</db.user.password>
-                <db.user.schema>bp</db.user.schema>
-                <db.driver.name>org.postgresql.Driver</db.driver.name>
-                <hibernate.dialect>org.hibernate.dialect.PostgreSQL9Dialect</hibernate.dialect>
-                <server.port>8080</server.port>
-
-            </properties>
-
-            <dependencies>
-                <dependency>
-                    <groupId>org.postgresql</groupId>
-                    <artifactId>postgresql</artifactId>
-                    <version>42.2.5</version>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
-
-    <dependencies>
+      <dependencies>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
-            <exclusions>
-                <!-- exclude logging -->
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-logging</artifactId>
-                </exclusion>
-            </exclusions>
+          <groupId>org.postgresql</groupId>
+          <artifactId>postgresql</artifactId>
+          <version>42.2.5</version>
         </dependency>
+      </dependencies>
+    </profile>
+  </profiles>
 
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter</artifactId>
+      <exclusions>
+        <!-- exclude logging -->
+        <exclusion>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-logging</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
 
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-jdbc</artifactId>
-        </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-tomcat</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
 
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-log4j2</artifactId>
-        </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-undertow</artifactId>
+    </dependency>
 
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-jdbc</artifactId>
+    </dependency>
 
-        <!-- async -->
-        <dependency>
-            <groupId>com.lmax</groupId>
-            <artifactId>disruptor</artifactId>
-            <version>${disruptor.version}</version>
-        </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-log4j2</artifactId>
+    </dependency>
 
-        <dependency>
-            <groupId>io.micrometer</groupId>
-            <artifactId>micrometer-core</artifactId>
-        </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
 
-        <dependency>
-            <groupId>io.micrometer</groupId>
-            <artifactId>micrometer-registry-prometheus</artifactId>
-        </dependency>
+    <!-- async -->
+    <dependency>
+      <groupId>com.lmax</groupId>
+      <artifactId>disruptor</artifactId>
+      <version>${disruptor.version}</version>
+    </dependency>
 
-        <dependency>
-            <groupId>io.micrometer</groupId>
-            <artifactId>micrometer-registry-jmx</artifactId>
-        </dependency>
+    <dependency>
+      <groupId>io.micrometer</groupId>
+      <artifactId>micrometer-core</artifactId>
+    </dependency>
 
-        <dependency>
-            <groupId>com.zaxxer</groupId>
-            <artifactId>HikariCP</artifactId>
-        </dependency>
+    <dependency>
+      <groupId>io.micrometer</groupId>
+      <artifactId>micrometer-registry-prometheus</artifactId>
+    </dependency>
 
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-jooq</artifactId>
-        </dependency>
+    <dependency>
+      <groupId>io.micrometer</groupId>
+      <artifactId>micrometer-registry-jmx</artifactId>
+    </dependency>
 
-    </dependencies>
+    <dependency>
+      <groupId>com.zaxxer</groupId>
+      <artifactId>HikariCP</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-jooq</artifactId>
+    </dependency>
+
+    <!--https://arnaudroger.github.io/blog/2017/03/02/jooq-one-to-many-without-dto.html -->
+
+    <dependency>
+      <groupId>org.simpleflatmapper</groupId>
+      <artifactId>sfm-jdbc</artifactId>
+      <version>${flatmapper.version}</version>
+    </dependency>
+  </dependencies>
 </project>
