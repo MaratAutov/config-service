@@ -1,5 +1,7 @@
 package configmanagement.domain;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -18,21 +20,28 @@ import lombok.ToString;
 @EqualsAndHashCode
 @Builder
 @ToString
+@ApiModel(description = "Конфигурационный параметр")
 public class Parameter {
     @Setter(AccessLevel.NONE)
     @ToString.Exclude
+    @ApiModelProperty(notes = "Идентификатор", dataType = "Integer")
     private Integer id;
+    @ApiModelProperty(notes = "Версия", dataType = "Integer")
     private Integer version = 1;
     @EqualsAndHashCode.Exclude
+    @ApiModelProperty(notes = "Наименование параметра", dataType = "String")
     private String name;
     @EqualsAndHashCode.Exclude
+    @ApiModelProperty(notes = "Значение параметра", dataType = "String")
     private String value;
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
+    @ApiModelProperty(notes = "Описание параметра", dataType = "String")
     private String description;
 
     @Setter(AccessLevel.NONE)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
+    @ApiModelProperty(notes = "Список подписок, в которые входит данный параметр")
     private List<Subscription> subscriptions = new ArrayList<>();
 }

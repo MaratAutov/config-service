@@ -65,10 +65,17 @@ public class Controller {
     @ResponseBody
     @ApiOperation(value = "Получить параметр по идентификатору")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Параметр найден")
+            @ApiResponse(code = 200, message = "Параметр найден"),
+            @ApiResponse(code = 404, message = "Параметр не найден")
     })
-    public Parameter getParameterById(@ApiParam(value = "Идентификатор параметра") @PathVariable Integer id) {
-        return service.getParameterById(id);
+    public ResponseEntity<Parameter> getParameterById(
+            @ApiParam(value = "Идентификатор параметра") @PathVariable Integer id) {
+        Parameter parameter = service.getParameterById(id);
+        if (parameter != null) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok(parameter);
+        }
     }
 
     @PutMapping("/parameters")
