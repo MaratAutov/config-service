@@ -11,13 +11,21 @@
     </File>
   </Appenders>
   <Loggers>
-    <Logger name="service" level="debug" additivity="false">
+    <Logger name="configmanagement" level="debug" additivity="false">
       <AppenderRef ref="LogToFile"/>
       <AppenderRef ref="LogToConsole"/>
     </Logger>
     <Logger name="org.springframework.boot" level="error" additivity="false">
       <AppenderRef ref="LogToConsole"/>
     </Logger>
+
+    <Logger name="org.jooq.tools.LoggerListener" level="debug"  additivity="false">
+      <AppenderRef ref="LogToConsole"/>
+    </Logger>
+    <Logger name="org.jooq" level="debug" additivity="false">
+      <AppenderRef ref="LogToConsole"/>
+    </Logger>
+
     <Root level="error">
       <AppenderRef ref="LogToFile"/>
       <AppenderRef ref="LogToConsole"/>
