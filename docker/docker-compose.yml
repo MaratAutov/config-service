@@ -9,12 +9,11 @@ services:
 
   db:
     build: postgresql/
-    image: postgresql:v9.5
     ports:
     - 5432:5432
     environment:
       - POSTGRES_PASSWORD=x5
-      - POSTGRES_DB=config-configmanagement.service-x5
+      - POSTGRES_DB=config-service-x5
     volumes:
     - ./postgresql/data:/var/lib/postgresql/data
 

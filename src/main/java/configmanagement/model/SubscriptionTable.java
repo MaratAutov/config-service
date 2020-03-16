@@ -1,11 +1,13 @@
 package configmanagement.model;
 
-import static org.jooq.impl.DSL.name;
-
 import java.sql.Timestamp;
+import org.jooq.Identity;
+import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.impl.CustomTable;
 import org.jooq.impl.SQLDataType;
+
+import static org.jooq.impl.DSL.name;
 
 public class SubscriptionTable extends CustomTable<SubscriptionRecord> {
     public static final SubscriptionTable INSTANCE = new SubscriptionTable();
@@ -32,5 +34,25 @@ public class SubscriptionTable extends CustomTable<SubscriptionRecord> {
     @Override
     public Class<? extends SubscriptionRecord> getRecordType() {
         return SubscriptionRecord.class;
+    }
+
+    @Override
+    public Identity<SubscriptionRecord, Integer> getIdentity() {
+        return new Identity<SubscriptionRecord, Integer>() {
+            @Override
+            public Table<SubscriptionRecord> getTable() {
+                return SubscriptionTable.INSTANCE;
+            }
+
+            @Override
+            public TableField<SubscriptionRecord, Integer> getField() {
+                return SubscriptionTable.INSTANCE.ID;
+            }
+        };
+    }
+
+    @Override
+    public TableField<SubscriptionRecord, ?> getRecordVersion() {
+        return SubscriptionTable.INSTANCE.VERSION;
     }
 }

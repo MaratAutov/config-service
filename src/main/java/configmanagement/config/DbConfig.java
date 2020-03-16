@@ -77,6 +77,8 @@ public class DbConfig {
     public DefaultDSLContext dslContext(ConnectionProvider connectionProvider) {
         final DefaultDSLContext dsl = new DefaultDSLContext(connectionProvider, SQLDialect.POSTGRES);
         dsl.configuration().set(new DefaultRecordListenerProvider(new AuditRecordListener()));
+        dsl.configuration().settings().setReturnIdentityOnUpdatableRecord(Boolean.TRUE);
+        dsl.configuration().settings().setReturnAllOnUpdatableRecord(Boolean.TRUE);
         return dsl;
     }
 
@@ -86,7 +88,7 @@ public class DbConfig {
     @SuppressWarnings("unchecked")
     private static class AuditRecordListener extends DefaultRecordListener {
         @Override
-        public void storeStart(RecordContext ctx) {
+        public void insertStart(RecordContext ctx) {
             final Record record = ctx.record();
             Stream.of("CREATE_DATE", "UPDATE_DATE")
                     .forEach(s -> updateField(record, s));

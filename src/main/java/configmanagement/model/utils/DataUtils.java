@@ -1,13 +1,21 @@
 package configmanagement.model.utils;
 
+import configmanagement.domain.Parameter;
+import configmanagement.domain.Subscriber;
+import configmanagement.domain.Subscription;
+import configmanagement.mapper.Mapper;
 import configmanagement.model.Parameter2SubscriptionTable;
+import configmanagement.model.ParameterRecord;
 import configmanagement.model.ParameterTable;
 import configmanagement.model.Subscriber2SubscriptionTable;
+import configmanagement.model.SubscriberRecord;
 import configmanagement.model.SubscriberTable;
+import configmanagement.model.SubscriptionRecord;
 import configmanagement.model.SubscriptionTable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jooq.DSLContext;
+import org.jooq.UpdatableRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -19,12 +27,13 @@ import static org.jooq.impl.DSL.constraint;
 public class DataUtils {
     private static final Logger log = LogManager.getLogger(DataUtils.class);
 
-
     private final DSLContext dslContext;
+    private final Mapper mapper;
 
     @Autowired
-    public DataUtils(@Qualifier("default") DSLContext context) {
+    public DataUtils(@Qualifier("default") DSLContext context, Mapper mapper) {
         this.dslContext = context;
+        this.mapper = mapper;
     }
 
     @Transactional
@@ -119,5 +128,54 @@ public class DataUtils {
 
     }
 
+    /**
+     * Сохранить данные по подписчику
+     *
+     * @param subscriber Подписчик
+     * @return обновленные данные
+     */
+    public Subscriber saveSubscriber(Subscriber subscriber) {
+        if (subscriber == null) {
+            throw new NullPointerException("The 'subscriber' cannot be null.");
+        }
 
+        return saveDomain(subscriber, SubscriberRecord.class);
+    }
+
+    /**
+     * Сохранить данные параметра
+     *
+     * @param parameter Параметр
+     * @return обновленные данные
+     */
+    public Parameter saveParameter(Parameter parameter) {
+        if (parameter == null) {
+            throw new NullPointerException("The 'parameter' cannot be null.");
+        }
+
+        return saveDomain(parameter, ParameterRecord.class);
+    }
+
+    /**
+     * Сохранить данные подписки
+     *
+     * @param subscription Подписка
+     * @return обновленные данные
+     */
+    public Subscription saveSubscription(Subscription subscription) {
+        if (subscription == null) {
+            throw new NullPointerException("The 'subscription' cannot be null.");
+        }
+
+        return saveDomain(subscription, SubscriptionRecord.class);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Transactional
+    <U extends UpdatableRecord, D> D saveDomain(D domain, Class<U> modelClass) {
+        final U record = mapper.toModel(domain, modelClass);
+        record.attach(dslContext.configuration());
+        record.store();
+        return mapper.toDomain(record, (Class<D>) domain.getClass());
+    }
 }

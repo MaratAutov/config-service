@@ -1,10 +1,10 @@
 package configmanagement.model;
 
-import static org.jooq.impl.DSL.name;
-
 import org.jooq.TableField;
 import org.jooq.impl.CustomTable;
 import org.jooq.impl.SQLDataType;
+
+import static org.jooq.impl.DSL.name;
 
 public class Parameter2SubscriptionTable extends CustomTable<Parameter2SubscriptionRecord> {
     public static final Parameter2SubscriptionTable INSTANCE = new Parameter2SubscriptionTable();

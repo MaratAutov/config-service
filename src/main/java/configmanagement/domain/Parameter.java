@@ -2,6 +2,7 @@ package configmanagement.domain;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -21,13 +22,13 @@ import lombok.ToString;
 @Builder
 @ToString
 @ApiModel(description = "Конфигурационный параметр")
-public class Parameter {
-    @Setter(AccessLevel.NONE)
-    @ToString.Exclude
+public class Parameter  implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     @ApiModelProperty(notes = "Идентификатор", dataType = "Integer")
     private Integer id;
     @ApiModelProperty(notes = "Версия", dataType = "Integer")
-    private Integer version = 1;
+    private Integer version = 0;
     @EqualsAndHashCode.Exclude
     @ApiModelProperty(notes = "Наименование параметра", dataType = "String")
     private String name;

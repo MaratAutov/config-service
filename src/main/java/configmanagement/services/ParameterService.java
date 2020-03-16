@@ -1,6 +1,7 @@
-package configmanagement.service;
+package configmanagement.services;
 
 import configmanagement.domain.Parameter;
+import configmanagement.domain.Subscriber;
 import configmanagement.domain.Subscription;
 import configmanagement.model.utils.DataUtils;
 import java.util.ArrayList;
@@ -11,18 +12,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ConfigServiceManagemt {
+public class ParameterService {
 
-    private static final Logger log = LogManager.getLogger(ConfigServiceManagemt.class);
+    private static final Logger log = LogManager.getLogger(ParameterService.class);
     private final DataUtils dataUtils;
 
     @Autowired
-    public ConfigServiceManagemt(DataUtils dataUtils) {
+    public ParameterService(DataUtils dataUtils) {
         this.dataUtils = dataUtils;
     }
 
-    public void addParameter(Parameter parameter) {
-        log.info("add parameter {}", parameter);
+    public Parameter addParameter(Parameter parameter) {
+        return dataUtils.saveParameter(parameter);
     }
 
     public List<Parameter> getParameters() {
@@ -49,8 +50,7 @@ public class ConfigServiceManagemt {
     }
 
     public Parameter updateParameter(Parameter parameter) {
-        log.info("update parameter {}", parameter);
-        return null;
+        return dataUtils.saveParameter(parameter);
     }
 
     public Boolean deleteParameterById(Integer id) {

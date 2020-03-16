@@ -25,8 +25,8 @@ public class WebConfig {
     }
 
     private ApiInfo createApiInfo() {
-        return new ApiInfoBuilder().title("Configuration service REST API")
-                .description("Configuration service REST API")
+        return new ApiInfoBuilder().title("Configuration services REST API")
+                .description("Configuration services REST API")
                 .contact(new Contact("X5 Corporate center.", "www.x5.ru", "info@x5.ru"))
                 .version("1.0.0")
                 .build();

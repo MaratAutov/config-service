@@ -3,6 +3,7 @@ package configmanagement.domain;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -22,13 +23,13 @@ import lombok.ToString;
 @Builder
 @ToString
 @ApiModel(description = "Подписчик")
-public class Subscriber {
-    @Setter(AccessLevel.NONE)
-    @ToString.Exclude
+public class Subscriber  implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     @ApiModelProperty(notes = "Идентификатор", dataType = "Integer")
     private Integer id;
     @ApiModelProperty(notes = "Версия", dataType = "Integer")
-    private Integer version = 1;
+    private Integer version = 0;
     @EqualsAndHashCode.Exclude
     @ApiModelProperty(notes = "Наименование подписчика", dataType = "String")
     private String name;

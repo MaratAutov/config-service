@@ -1,11 +1,13 @@
 package configmanagement.model;
 
-import static org.jooq.impl.DSL.name;
-
 import java.sql.Timestamp;
+import org.jooq.Identity;
+import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.impl.CustomTable;
 import org.jooq.impl.SQLDataType;
+
+import static org.jooq.impl.DSL.name;
 
 public class ParameterTable extends CustomTable<ParameterRecord> {
     public static final ParameterTable INSTANCE = new ParameterTable();
@@ -33,5 +35,20 @@ public class ParameterTable extends CustomTable<ParameterRecord> {
     @Override
     public Class<? extends ParameterRecord> getRecordType() {
         return ParameterRecord.class;
+    }
+
+    @Override
+    public Identity<ParameterRecord, Integer> getIdentity() {
+        return new Identity<ParameterRecord, Integer>() {
+            @Override
+            public Table<ParameterRecord> getTable() {
+                return ParameterTable.INSTANCE;
+            }
+
+            @Override
+            public TableField<ParameterRecord, Integer> getField() {
+                return ParameterTable.INSTANCE.ID;
+            }
+        };
     }
 }

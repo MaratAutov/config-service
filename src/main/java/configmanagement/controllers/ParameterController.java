@@ -1,7 +1,7 @@
-package configmanagement.controller;
+package configmanagement.controllers;
 
 import configmanagement.domain.Parameter;
-import configmanagement.service.ConfigServiceManagemt;
+import configmanagement.services.ParameterService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -23,35 +23,37 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/config")
+@RequestMapping("/config/parameters")
 @Api(value = "Сервис управления конфигурационными параметрами", description = "Сервис управления конфигурационными параметрами")
-public class Controller {
+public class ParameterController {
 
-    private final ConfigServiceManagemt service;
+    private final ParameterService service;
 
     @Autowired
-    public Controller(ConfigServiceManagemt service) {
+    public ParameterController(ParameterService service) {
         this.service = service;
     }
 
     /**
      * @param parameter
      */
-    @PostMapping("/parameters")
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(value = "Добавить параметр")
-    public void addParameter(@ApiParam(value = "Добавляемый параметр") @RequestBody Parameter parameter) {
+    public ResponseEntity<Parameter> addParameter(
+            @ApiParam(value = "Добавляемый параметр") @RequestBody Parameter parameter) {
         service.addParameter(parameter);
+        return ResponseEntity.ok(service.addParameter(parameter));
     }
 
     /**
      * @return
      */
-    @GetMapping("/parameters")
+    @GetMapping
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public List<Parameter> getParameters() {
-        return service.getParameters();
+    public ResponseEntity<List<Parameter>> getParameters() {
+        return ResponseEntity.ok(service.getParameters());
     }
 
     /**
@@ -60,7 +62,7 @@ public class Controller {
      * @param id
      * @return
      */
-    @GetMapping("/parameters/{id}")
+    @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     @ApiOperation(value = "Получить параметр по идентификатору")
@@ -78,7 +80,7 @@ public class Controller {
         }
     }
 
-    @PutMapping("/parameters")
+    @PutMapping
     @ResponseStatus(HttpStatus.ACCEPTED)
     @ResponseBody
     public ResponseEntity<Parameter> updateParameter(@RequestBody Parameter parameter) {
@@ -91,7 +93,7 @@ public class Controller {
      * @param id идентификатор параметра
      * @return
      */
-    @DeleteMapping("/parameters/{id}")
+    @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     @ApiOperation(value = "Удалить параметр по идентификатору")
