@@ -1,6 +1,7 @@
 package configmanagement.controllers;
 
 import configmanagement.domain.Parameter;
+import configmanagement.domain.Subscription;
 import configmanagement.services.ParameterService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -43,7 +44,7 @@ public class ParameterController {
     public ResponseEntity<Parameter> addParameter(
             @ApiParam(value = "Добавляемый параметр") @RequestBody Parameter parameter) {
         service.addParameter(parameter);
-        return ResponseEntity.ok(service.addParameter(parameter));
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.addParameter(parameter));
     }
 
     /**
@@ -109,5 +110,23 @@ public class ParameterController {
             return ResponseEntity.ok().build();
         }
     }
+
+    /**
+     * Добавить подписку в параметр
+     *
+     * @param id идентификатор параметра
+     * @param subscription подписка
+     * @return
+     */
+    @PostMapping("/{id}/subscriptions")
+    @ResponseStatus(HttpStatus.CREATED)
+    @ApiOperation(value = "Добавить подписку в параметр")
+    public ResponseEntity<?> addSubscription2Parameter(
+            @ApiParam(value = "Идентификатор параметра") @PathVariable Integer id,
+            @ApiParam(value = "Добавляемая подписка") @RequestBody Subscription subscription) {
+        service.addSubscription2Parameter(id, subscription);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
 
 }

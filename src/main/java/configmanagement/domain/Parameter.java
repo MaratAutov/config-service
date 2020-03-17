@@ -22,7 +22,7 @@ import lombok.ToString;
 @Builder
 @ToString
 @ApiModel(description = "Конфигурационный параметр")
-public class Parameter  implements Serializable {
+public class Parameter implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(notes = "Идентификатор", dataType = "Integer")

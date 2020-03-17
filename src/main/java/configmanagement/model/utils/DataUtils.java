@@ -1,20 +1,21 @@
 package configmanagement.model.utils;
 
-import configmanagement.domain.Parameter;
-import configmanagement.domain.Subscriber;
-import configmanagement.domain.Subscription;
-import configmanagement.mapper.Mapper;
 import configmanagement.model.Parameter2SubscriptionTable;
 import configmanagement.model.ParameterRecord;
 import configmanagement.model.ParameterTable;
 import configmanagement.model.Subscriber2SubscriptionTable;
-import configmanagement.model.SubscriberRecord;
 import configmanagement.model.SubscriberTable;
-import configmanagement.model.SubscriptionRecord;
 import configmanagement.model.SubscriptionTable;
+import java.util.Collection;
+import lombok.NonNull;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.Record;
+import org.jooq.Result;
+import org.jooq.Table;
+import org.jooq.TableField;
 import org.jooq.UpdatableRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -22,18 +23,18 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.jooq.impl.DSL.constraint;
+import static org.jooq.impl.DSL.val;
 
 @Component
+@SuppressWarnings("unchecked")
 public class DataUtils {
     private static final Logger log = LogManager.getLogger(DataUtils.class);
 
     private final DSLContext dslContext;
-    private final Mapper mapper;
 
     @Autowired
-    public DataUtils(@Qualifier("default") DSLContext context, Mapper mapper) {
+    public DataUtils(@Qualifier("default") DSLContext context) {
         this.dslContext = context;
-        this.mapper = mapper;
     }
 
     @Transactional
@@ -50,7 +51,7 @@ public class DataUtils {
                 .column(ParameterTable.INSTANCE.DESCRIPTION)
                 .column(ParameterTable.INSTANCE.VALUE)
                 .constraints(
-                        constraint("PK_" + ParameterTable.INSTANCE.getName()).primaryKey(ParameterTable.INSTANCE.ID)
+                        constraint(ParameterTable.PK_NAME).primaryKey(ParameterTable.INSTANCE.getPrimaryKey().getFieldsArray())
                 ).execute();
         log.info("Table {} has been created successfully", ParameterTable.INSTANCE.getQualifiedName());
 
@@ -90,9 +91,8 @@ public class DataUtils {
                 .column(Subscriber2SubscriptionTable.INSTANCE.SUBSCRIBER_ID)
                 .column(Subscriber2SubscriptionTable.INSTANCE.SUBSCRIPTION_ID)
                 .constraints(
-                        constraint("PK_" + Subscriber2SubscriptionTable.INSTANCE.getName()).primaryKey(
-                                Subscriber2SubscriptionTable.INSTANCE.SUBSCRIBER_ID,
-                                Subscriber2SubscriptionTable.INSTANCE.SUBSCRIPTION_ID
+                        constraint(Subscriber2SubscriptionTable.PK_NAME).primaryKey(
+                                Subscriber2SubscriptionTable.INSTANCE.getPrimaryKey().getFieldsArray()
                         ),
                         constraint("FK_" + Subscriber2SubscriptionTable.INSTANCE.getName() + "_SUBSCRIBER").foreignKey(
                                 Subscriber2SubscriptionTable.INSTANCE.SUBSCRIBER_ID)
@@ -111,9 +111,8 @@ public class DataUtils {
                 .column(Parameter2SubscriptionTable.INSTANCE.PARAMETER_ID)
                 .column(Parameter2SubscriptionTable.INSTANCE.SUBSCRIPTION_ID)
                 .constraints(
-                        constraint("PK_" + Parameter2SubscriptionTable.INSTANCE.getName()).primaryKey(
-                                Parameter2SubscriptionTable.INSTANCE.PARAMETER_ID,
-                                Parameter2SubscriptionTable.INSTANCE.SUBSCRIPTION_ID
+                        constraint(Parameter2SubscriptionTable.PK_NAME).primaryKey(
+                                Parameter2SubscriptionTable.INSTANCE.getPrimaryKey().getFieldsArray()
                         ),
                         constraint("FK_" + Parameter2SubscriptionTable.INSTANCE.getName() + "_PARAMETER").foreignKey(
                                 Parameter2SubscriptionTable.INSTANCE.PARAMETER_ID)
@@ -128,54 +127,81 @@ public class DataUtils {
 
     }
 
-    /**
-     * Сохранить данные по подписчику
-     *
-     * @param subscriber Подписчик
-     * @return обновленные данные
-     */
-    public Subscriber saveSubscriber(Subscriber subscriber) {
-        if (subscriber == null) {
-            throw new NullPointerException("The 'subscriber' cannot be null.");
-        }
-
-        return saveDomain(subscriber, SubscriberRecord.class);
-    }
 
     /**
-     * Сохранить данные параметра
+     * Сохранить и вернуть обновленные данные
      *
-     * @param parameter Параметр
-     * @return обновленные данные
+     * @param record
+     * @param <R>
+     * @return
      */
-    public Parameter saveParameter(Parameter parameter) {
-        if (parameter == null) {
-            throw new NullPointerException("The 'parameter' cannot be null.");
-        }
-
-        return saveDomain(parameter, ParameterRecord.class);
-    }
-
-    /**
-     * Сохранить данные подписки
-     *
-     * @param subscription Подписка
-     * @return обновленные данные
-     */
-    public Subscription saveSubscription(Subscription subscription) {
-        if (subscription == null) {
-            throw new NullPointerException("The 'subscription' cannot be null.");
-        }
-
-        return saveDomain(subscription, SubscriptionRecord.class);
-    }
-
-    @SuppressWarnings("unchecked")
-    @Transactional
-    <U extends UpdatableRecord, D> D saveDomain(D domain, Class<U> modelClass) {
-        final U record = mapper.toModel(domain, modelClass);
+    public <R extends UpdatableRecord<R>> R store(@NonNull R record) {
         record.attach(dslContext.configuration());
         record.store();
-        return mapper.toDomain(record, (Class<D>) domain.getClass());
+        return record;
+    }
+
+    /**
+     * @return
+     */
+    public <R extends Record, T extends Table<R>> Collection<R> getAllRecords(@NonNull T table) {
+        Result<R> records = (Result<R>) dslContext
+                .select()
+                .from(table)
+                .fetch();
+        return records;
+    }
+
+    /**
+     * Получить запись по первичному ключу
+     *
+     * @param id      Идентификатор
+     * @param table   Таблица
+     * @param pkField Поле первичного ключа
+     * @param <R>     Тип записи
+     * @param <T>     Тип таблицы
+     * @return Найденная запись в таблице
+     */
+    public <R extends Record, T extends Table<R>> R getRecordById(@NonNull T table, @NonNull Field<Integer> pkField, @NonNull Integer id) {
+        R record = (R) dslContext
+                .select()
+                .from(table)
+                .where(pkField.eq(id))
+                .fetchOne();
+        return record;
+    }
+
+    /**
+     * Удалить запись по первичному ключу
+     *
+     * @param table   Таблица
+     * @param pkField Поле первичного ключа
+     * @param id      Идентификатор
+     * @param <R>     Тип записи
+     * @param <T>     Тип таблицы
+     * @return Результат удаления записи. {@code true} если запись удалена, иначе {@code false}
+     */
+    public <R extends Record, T extends Table<R>> Boolean deleteRecordById(@NonNull T table,
+            @NonNull Field<Integer> pkField, @NonNull Integer id) {
+        return dslContext.deleteFrom(table).where(pkField.eq(id)).execute() != 0;
+    }
+
+    /**
+     *
+     * @param table   Таблица
+     * @param pkField Поле первичного ключа
+     * @param id      Идентификатор
+     * @param <R>     Тип записи
+     * @param <T>     Тип таблицы
+     * @return
+     */
+    public <R extends Record, T extends Table<R>>  boolean isRecordExists(@NonNull T table,
+            @NonNull Field<Integer> pkField,
+            @NonNull Integer id) {
+        return dslContext.fetchExists(dslContext.select().from(table).where(pkField.eq(id)));
+    }
+
+    public DSLContext getDslContext() {
+        return dslContext;
     }
 }
