@@ -1,16 +1,27 @@
 package configmanagement.model;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import org.jooq.Constraint;
+import org.jooq.Field;
+import org.jooq.ForeignKey;
 import org.jooq.Identity;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.UniqueKey;
 import org.jooq.impl.CustomTable;
+import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 
+import static java.util.Arrays.asList;
 import static org.jooq.impl.DSL.name;
 
 public class SubscriptionTable extends CustomTable<SubscriptionRecord> {
     public static final SubscriptionTable INSTANCE = new SubscriptionTable();
+    public static final String PK_NAME = "PK_SUBSCRIPTIONS";
 
     public final TableField<SubscriptionRecord, Integer> ID = createField(name("ID"),
             SQLDataType.INTEGER.identity(true));
@@ -52,7 +63,51 @@ public class SubscriptionTable extends CustomTable<SubscriptionRecord> {
     }
 
     @Override
+    public UniqueKey<SubscriptionRecord> getPrimaryKey() {
+        return new UniqueKey<SubscriptionRecord>() {
+            @Override
+            public List<ForeignKey<?, SubscriptionRecord>> getReferences() {
+                return new ArrayList<>();
+            }
+
+            @Override
+            public boolean isPrimary() {
+                return true;
+            }
+
+            @Override
+            public String getName() {
+                return PK_NAME;
+            }
+
+            @Override
+            public Table<SubscriptionRecord> getTable() {
+                return INSTANCE;
+            }
+
+            @Override
+            public List<TableField<SubscriptionRecord, ?>> getFields() {
+                return Collections.singletonList(INSTANCE.ID);
+            }
+
+            @Override
+            public TableField<SubscriptionRecord, ?>[] getFieldsArray() {
+                return new TableField[]{INSTANCE.ID};
+            }
+
+            @Override
+            public Constraint constraint() {
+                return DSL.constraint(PK_NAME);
+            }
+        };
+    }
+
+    @Override
     public TableField<SubscriptionRecord, ?> getRecordVersion() {
         return SubscriptionTable.INSTANCE.VERSION;
+    }
+
+    public Collection<? extends Field<?>> getColumns() {
+        return asList(ID, VERSION, CREATE_DATE, UPDATE_DATE, OBSOLETE, NAME, DESCRIPTION);
     }
 }

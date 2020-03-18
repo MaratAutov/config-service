@@ -4,9 +4,11 @@ import configmanagement.domain.Parameter;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import org.jooq.Constraint;
+import org.jooq.Field;
 import org.jooq.ForeignKey;
 import org.jooq.Identity;
 import org.jooq.Table;
@@ -16,6 +18,7 @@ import org.jooq.impl.CustomTable;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 
+import static java.util.Arrays.asList;
 import static org.jooq.impl.DSL.name;
 
 public class ParameterTable extends CustomTable<ParameterRecord> {
@@ -100,5 +103,9 @@ public class ParameterTable extends CustomTable<ParameterRecord> {
                 return INSTANCE.ID;
             }
         };
+    }
+
+    public Collection<? extends Field<?>> getColumns() {
+        return asList(ID, VERSION, CREATE_DATE, UPDATE_DATE, OBSOLETE, NAME, DESCRIPTION, VALUE);
     }
 }

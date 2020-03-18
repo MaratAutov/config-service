@@ -1,8 +1,10 @@
 package configmanagement.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import org.jooq.Constraint;
+import org.jooq.Field;
 import org.jooq.ForeignKey;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -71,5 +73,9 @@ public class Subscriber2SubscriptionTable extends CustomTable<Subscriber2Subscri
                 return DSL.constraint(PK_NAME);
             }
         };
+    }
+
+    public Collection<? extends Field<?>> getColumns() {
+        return asList(SUBSCRIBER_ID, SUBSCRIPTION_ID);
     }
 }

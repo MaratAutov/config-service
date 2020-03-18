@@ -42,7 +42,7 @@ public class DbConfig {
     private String dbSchema;
 
     @Bean
-    public DataSource dataSource() {
+    public HikariDataSource hikaryDataSource() {
         HikariDataSource dataSource = new HikariDataSource();
         dataSource.setDriverClassName(driverClassName);
         dataSource.setJdbcUrl(jdbcUrl);
@@ -54,12 +54,12 @@ public class DbConfig {
     }
 
     @Bean(name = "transactionManager")
-    public TransactionManager transactionManager(DataSource dataSource) {
+    public TransactionManager transactionManager(HikariDataSource dataSource) {
         return new DataSourceTransactionManager(dataSource);
     }
 
     @Bean
-    public TransactionAwareDataSourceProxy transactionAwareDataSource(DataSource dataSource) {
+    public TransactionAwareDataSourceProxy transactionAwareDataSource(HikariDataSource dataSource) {
         return new TransactionAwareDataSourceProxy(dataSource);
     }
 
@@ -68,12 +68,7 @@ public class DbConfig {
         return new DataSourceConnectionProvider(transactionAwareDataSource);
     }
 
-    @Bean
-    public JdbcTemplate jdbcTemplate() {
-        return new JdbcTemplate(dataSource());
-    }
-
-    @Bean(name = "default")
+     @Bean(name = "default")
     public DefaultDSLContext dslContext(ConnectionProvider connectionProvider) {
         final DefaultDSLContext dsl = new DefaultDSLContext(connectionProvider, SQLDialect.POSTGRES);
         dsl.configuration().set(new DefaultRecordListenerProvider(new AuditRecordListener()));
