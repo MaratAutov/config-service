@@ -1,7 +1,10 @@
 package configmanagement.config;
 
+import static org.jooq.impl.DSL.name;
+
 import com.zaxxer.hikari.HikariDataSource;
 import java.sql.Timestamp;
+import java.util.Collections;
 import java.util.stream.Stream;
 import javax.sql.DataSource;
 import org.jooq.ConnectionProvider;
@@ -14,16 +17,15 @@ import org.jooq.impl.DataSourceConnectionProvider;
 import org.jooq.impl.DefaultDSLContext;
 import org.jooq.impl.DefaultRecordListener;
 import org.jooq.impl.DefaultRecordListenerProvider;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
 import org.springframework.transaction.TransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-
-import static org.jooq.impl.DSL.name;
 
 @Configuration
 @EnableTransactionManagement
@@ -42,24 +44,24 @@ public class DbConfig {
     private String dbSchema;
 
     @Bean
-    public HikariDataSource hikaryDataSource() {
-        HikariDataSource dataSource = new HikariDataSource();
-        dataSource.setDriverClassName(driverClassName);
-        dataSource.setJdbcUrl(jdbcUrl);
-        dataSource.setUsername(userName);
-        dataSource.setPassword(password);
-        dataSource.setSchema(dbSchema);
-        dataSource.setMaximumPoolSize(100);
-        return dataSource;
+    public DataSourceProperties dataSourceProperties() throws Exception {
+        DataSourceProperties properties = new DataSourceProperties();
+        properties.setUsername(userName);
+        properties.setSchema(Collections.singletonList(dbSchema));
+        properties.setPassword(password);
+        properties.setName("pool-config-service");
+        properties.setDriverClassName(driverClassName);
+        properties.afterPropertiesSet();
+        return properties;
     }
 
     @Bean(name = "transactionManager")
-    public TransactionManager transactionManager(HikariDataSource dataSource) {
+    public TransactionManager transactionManager(DataSource dataSource) {
         return new DataSourceTransactionManager(dataSource);
     }
 
     @Bean
-    public TransactionAwareDataSourceProxy transactionAwareDataSource(HikariDataSource dataSource) {
+    public TransactionAwareDataSourceProxy transactionAwareDataSource(DataSource dataSource) {
         return new TransactionAwareDataSourceProxy(dataSource);
     }
 
@@ -68,7 +70,7 @@ public class DbConfig {
         return new DataSourceConnectionProvider(transactionAwareDataSource);
     }
 
-     @Bean(name = "default")
+    @Bean(name = "dslContext")
     public DefaultDSLContext dslContext(ConnectionProvider connectionProvider) {
         final DefaultDSLContext dsl = new DefaultDSLContext(connectionProvider, SQLDialect.POSTGRES);
         dsl.configuration().set(new DefaultRecordListenerProvider(new AuditRecordListener()));

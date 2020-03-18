@@ -30,7 +30,7 @@ public class DataUtils {
     private final DSLContext dslContext;
 
     @Autowired
-    public DataUtils(@Qualifier("default") DSLContext context) {
+    public DataUtils(@Qualifier("dslContext") DSLContext context) {
         this.dslContext = context;
     }
 
